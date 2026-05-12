@@ -60,12 +60,16 @@ def measure_ref_program_time(
 
 
             # set model weights and inputs to specified precision
+            # Only convert floating-point tensors; integer tensors (e.g. class
+            # indices for CrossEntropyLoss) must keep their original dtype.
             inputs = [
-                x.to(device=device, dtype=precision_dtype) if isinstance(x, torch.Tensor) else x
+                x.to(device=device, dtype=precision_dtype) if isinstance(x, torch.Tensor) and x.is_floating_point() else
+                x.to(device=device) if isinstance(x, torch.Tensor) else x
                 for x in inputs
             ]
             init_inputs = [
-                x.to(device=device, dtype=precision_dtype) if isinstance(x, torch.Tensor) else x
+                x.to(device=device, dtype=precision_dtype) if isinstance(x, torch.Tensor) and x.is_floating_point() else
+                x.to(device=device) if isinstance(x, torch.Tensor) else x
                 for x in init_inputs
             ]
 
